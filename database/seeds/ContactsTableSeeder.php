@@ -13,7 +13,7 @@ class ContactsTableSeeder extends Seeder
     public function run()
     {
          DB::table('contacts')->truncate();
-         
+
         $faker = Faker::create();
         $contacts = [];
 
@@ -25,6 +25,7 @@ class ContactsTableSeeder extends Seeder
                   'address' => "{$faker->streetName} {$faker->postcode} {$faker->city}",
                   'company' => $faker->company,
                   'group_id' => rand(1, 3),
+                  'image' => 'assets/img/avatar5.png',
                   'created_at' => new DateTime,
                   'updated_at' => new DateTime,
              ];
