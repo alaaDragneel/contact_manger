@@ -16,14 +16,46 @@ class ContactsController extends Controller
     'email' => ['required', 'email'],
     'company' => ['required'],
   ];
+  public function autocompelete(Request $request)
+  {
+    if($request->ajax()) {
+      $contactSearch = Contact::select(['id', 'name as value'])->where(function($q) use($request) {
+        if($term = $request->term) {
+          $keyWords = '%'. $term .'%';
+          $q->orWhere('name', 'LIKE', $keyWords);
+          $q->orWhere('company', 'LIKE', $keyWords);
+          $q->orWhere('email', 'LIKE', $keyWords);
+        }
+      })
+      ->orderBy('name', 'asc')
+      ->take(5)
+      ->get();
+      return $contactSearch;
+    }
+  }
   public function index(Request $request)
   {
+    // if($group_id = $request->group_id){
+    //   $contacts = Contact::where('group_id', $group_id)->orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
+    // }else{
+    //   $contacts = Contact::orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
+    // }
 
-    if($group_id = $request->group_id){
-      $contacts = Contact::where('group_id', $group_id)->orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
-    }else{
-      $contacts = Contact::orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
-    }
+    $contacts = Contact::where(function($q) use($request) {
+      if($group_id = $request->group_id) {
+        $q->where('group_id', $group_id);
+      }
+
+      if($term = $request->term) {
+        $keyWords = '%'. $term .'%';
+        $q->orWhere('name', 'LIKE', $keyWords);
+        $q->orWhere('company', 'LIKE', $keyWords);
+        $q->orWhere('email', 'LIKE', $keyWords);
+      }
+    })
+      ->orderBy('id', 'desc')
+      ->paginate($this->limit, ['*'], 'contact_list');
+
     return view('contacts.index', compact('contacts'));
   }
 

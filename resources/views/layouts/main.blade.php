@@ -9,6 +9,7 @@
     <!-- Bootstrap -->
     <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/jasny-bootstrap.min.css')}}" rel="stylesheet">
+    <link href="{{asset('assets/jquery-ui/jquery-ui.min.css')}}" rel="stylesheet">
     <link href="{{asset('assets/css/custom.css')}}" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -41,6 +42,16 @@
               Add Contact
             </a>
           </div>
+          <form action="{{ route('contacts.index') }}" class="navbar-form navbar-right" role="search">
+            <div class="input-group">
+              <input type="text" name="term" value="{{ Request::get('term') }}" class="form-control" placeholder="Search..." autocomplete="off"/>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-default">
+                  <i class="glyphicon glyphicon-search"></i>
+                </button>
+              </span>
+            </div>
+          </form>
         </div>
       </div>
     </nav>
@@ -68,14 +79,18 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{asset('assets/js/bootstrap.min.js')}}"></script>
     <script src="{{asset('assets/js/jasny-bootstrap.min.js')}}"></script>
+    <script src="{{asset('assets/jquery-ui/jquery-ui.min.js')}}"></script>
     <script>
-      $("#add-new-group").hide();
-      $('#add-group-btn').click(function () {
-        $("#add-new-group").slideToggle(function() {
-          $('#new_group').focus();
-        });
-        return false;
+    $(function() {
+      $('input[name=term]').autocomplete({
+        source: '{{ route('contacts.autocompelete') }}',
+        minLength: 3,
+        select: function(event, ui) {
+          $(this).val(ui.item.value);
+        }
       });
+    });
     </script>
+    @yield('scripts')
   </body>
 </html>

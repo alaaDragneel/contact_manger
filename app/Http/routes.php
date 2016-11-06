@@ -15,4 +15,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/contacts/autocompelete', [
+  'uses' => 'ContactsController@autocompelete',
+  'as' => 'contacts.autocompelete'
+]);
+
+Route::post('/groups/store', [
+  'uses' => 'GroupsController@store',
+  'as' => 'groups.store'
+]);
+
 Route::resource('contacts', 'ContactsController');
