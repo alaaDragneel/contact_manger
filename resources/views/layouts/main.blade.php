@@ -1,70 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>My Contact</title>
-    <!-- Bootstrap -->
-    <link href="{{asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{asset('assets/css/jasny-bootstrap.min.css')}}" rel="stylesheet">
-    <link href="{{asset('assets/jquery-ui/jquery-ui.min.css')}}" rel="stylesheet">
-    <link href="{{asset('assets/css/custom.css')}}" rel="stylesheet">
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <!-- navbar -->
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
 
-          <a class="navbar-brand text-uppercase" href="#">
-            My contact
-          </a>
-        </div>
-        <!-- /.navbar-header -->
-        <div class="collapse navbar-collapse" id="navbar-collapse">
-          <div class="nav navbar-right navbar-btn">
-            <a href="{{ route('contacts.create') }}" class="btn btn-default">
-              <i class="glyphicon glyphicon-plus"></i>
-              Add Contact
-            </a>
-          </div>
-          <form action="{{ route('contacts.index') }}" class="navbar-form navbar-right" role="search">
-            <div class="input-group">
-              <input type="text" name="term" value="{{ Request::get('term') }}" class="form-control" placeholder="Search..." autocomplete="off"/>
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-default">
-                  <i class="glyphicon glyphicon-search"></i>
-                </button>
-              </span>
-            </div>
-          </form>
-        </div>
-      </div>
-    </nav>
-
+     @include('layouts.includes.header')
+     @include('layouts.includes.navbar')
     <!-- content -->
     <div class="container">
       <div class="row">
         <div class="col-md-3">
           <div class="list-group">
-            <?php $group_idCheck = Request::get('group_id') ?>
-            <a href="{{ route('contacts.index') }}" class="list-group-item {{ empty($group_idCheck) ? 'active' : '' }}">All Contact <span class="badge">{{ App\Contact::count() }}</span></a>
-            @foreach (App\Group::all() as $group)
-              <a href="{{ route('contacts.index', ['group_id' => $group->id]) }}" class="list-group-item {{ $group_idCheck == $group->id ? 'active' : ''}}">{{ $group->name }} <span class="badge">{{ $group->contacts->count() }}</span></a>
+            <?php
+               $group_idCheck = Request::get('group_id');
+               $listGroups = listGroups(Auth::user()->id);
+              ?>
+            <a href="{{ route('contacts.index') }}" class="list-group-item {{ empty($group_idCheck) ? 'active' : '' }}">All Contact <span class="badge">{{ collect($listGroups)->sum('total') }}</span></a>
+            @foreach ($listGroups as $group)
+              <a href="{{ route('contacts.index', ['group_id' => $group->id]) }}" class="list-group-item {{ $group_idCheck == $group->id ? 'active' : ''}}">{{ $group->name }} <span class="badge">{{ $group->total }}</span></a>
             @endforeach
           </div>
         </div><!-- /.col-md-3 -->
@@ -74,23 +22,4 @@
         </div><!-- /.col-md-9 -->
       </div>
     </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="{{asset('assets/js/jquery.min.js')}}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{asset('assets/js/bootstrap.min.js')}}"></script>
-    <script src="{{asset('assets/js/jasny-bootstrap.min.js')}}"></script>
-    <script src="{{asset('assets/jquery-ui/jquery-ui.min.js')}}"></script>
-    <script>
-    $(function() {
-      $('input[name=term]').autocomplete({
-        source: '{{ route('contacts.autocompelete') }}',
-        minLength: 3,
-        select: function(event, ui) {
-          $(this).val(ui.item.value);
-        }
-      });
-    });
-    </script>
-    @yield('scripts')
-  </body>
-</html>
+    @include('layouts.includes.footer')

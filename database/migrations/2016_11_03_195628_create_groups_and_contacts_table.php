@@ -28,6 +28,7 @@ class CreateGroupsAndContactsTable extends Migration
             $table->string('phone');
             $table->string('address');
             $table->string('image');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }

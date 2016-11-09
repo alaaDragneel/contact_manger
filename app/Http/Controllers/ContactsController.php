@@ -16,6 +16,10 @@ class ContactsController extends Controller
     'email' => ['required', 'email'],
     'company' => ['required'],
   ];
+  public function __construct()
+  {
+       $this->middleware('auth');
+  }
   public function autocompelete(Request $request)
   {
     if($request->ajax()) {
@@ -35,13 +39,9 @@ class ContactsController extends Controller
   }
   public function index(Request $request)
   {
-    // if($group_id = $request->group_id){
-    //   $contacts = Contact::where('group_id', $group_id)->orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
-    // }else{
-    //   $contacts = Contact::orderBy('id', 'desc')->paginate($this->limit, ['*'], 'contact_list');
-    // }
-
     $contacts = Contact::where(function($q) use($request) {
+         // fillter by current user
+         $q->where('user_id', $request->user()->id);
       if($group_id = $request->group_id) {
         $q->where('group_id', $group_id);
       }
@@ -81,7 +81,7 @@ class ContactsController extends Controller
         }else {
           $contact->image = 'assets/img/avatar5.png';
         }
-    $saveContact = $contact->save();
+    $saveContact = $request->user()->contacts()->save($contact);
     if($saveContact){
       return redirect('contacts')->with(['success' => 'Contact Saved!']);
     }
@@ -90,7 +90,8 @@ class ContactsController extends Controller
 
   public function edit($id)
   {
-    $contact = Contact::find($id);
+    $contact = Contact::findOrFail($id);
+    $this->authorize('modify', $contact);
     $groups = Group::pluck('name', 'id');
     return view('contacts.edit', compact('groups', 'contact'));
   }
@@ -98,8 +99,8 @@ class ContactsController extends Controller
   public function update($id, Request $request)
   {
     $this->validate($request, $this->rules);
-
-    $contact = Contact::find($id);
+    $contact = Contact::findOrFail($id);
+    $this->authorize('modify', $contact);
     $contact->name = $request->name;
     $contact->email = $request->email;
     $contact->company = $request->company;
@@ -123,9 +124,8 @@ class ContactsController extends Controller
 
   public function destroy($id, Request $request)
   {
-
-    $contact = Contact::find($id);
-
+     $contact = Contact::findOrFail($id);
+     $this->authorize('modify', $contact);
     $this->removeImage($contact->image);
     $saveContact = $contact->delete();
     if($saveContact){

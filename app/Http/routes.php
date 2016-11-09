@@ -26,3 +26,7 @@ Route::post('/groups/store', [
 ]);
 
 Route::resource('contacts', 'ContactsController');
+
+Route::auth();
+
+Route::get('/home', 'HomeController@index');

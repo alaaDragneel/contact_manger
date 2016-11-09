@@ -5,9 +5,20 @@
 		<div class="alert alert-success">{{ Session::get('success') }}</div>
 	@endif
   <div class="panel panel-default">
+	  <div class="panel-heading clearfix">
+	  	<div class="pull-left">
+			<h4>All Contacts</h4>
+		</div>
+	  	<div class="pull-right">
+            <a href="{{ route('contacts.create') }}" class="btn btn-default">
+              <i class="glyphicon glyphicon-plus"></i>
+              Add Contact
+            </a>
+		</div>
+	  </div>
     <table class="table table-hover">
-			@foreach($contacts as $contact)
-				<tr>
+	@foreach($contacts as $contact)
+	<tr>
         <td class="middle">
           <div class="media">
             <div class="media-left">
@@ -37,7 +48,7 @@
           </div>
         </td>
       </tr>
-			@endforeach
+	@endforeach
     </table>
   </div>
 
